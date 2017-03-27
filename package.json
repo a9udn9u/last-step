@@ -46,7 +46,7 @@
     "url": "https://github.com/a9udn9u/last-step/issues"
   },
   "homepage": "https://github.com/a9udn9u/last-step#readme",
-  "devDependencies": {
+  "dependencies": {
     "less": "^2.7.2",
     "request": "^2.81.0",
     "rollup": "^0.41.6",
