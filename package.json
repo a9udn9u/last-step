@@ -1,0 +1,56 @@
+{
+  "name": "last-step",
+  "version": "0.0.1",
+  "description": "Make your project production ready by combining and minifying JS/CSS/LESS files.",
+  "main": "index.js",
+  "scripts": {
+  },
+  "bin": {
+    "last-step": "bin/build.js"
+  },
+  "files": [
+    "bin",
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a9udn9u/last-step.git"
+  },
+  "keywords": [
+    "rollup js",
+    "rollup javascript",
+    "rollup css",
+    "rollup less",
+    "minify js",
+    "minify javascript",
+    "minify css",
+    "minify less",
+    "uglify js",
+    "uglify javascript",
+    "uglify css",
+    "uglify less",
+    "last step",
+    "production ready",
+    "js",
+    "javascript",
+    "css",
+    "less",
+    "electron",
+    "minify",
+    "rollup",
+    "uglify"
+  ],
+  "author": "Quan Gan (https://github.com/a9udn9u/last-step)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/a9udn9u/last-step/issues"
+  },
+  "homepage": "https://github.com/a9udn9u/last-step#readme",
+  "devDependencies": {
+    "less": "^2.7.2",
+    "request": "^2.81.0",
+    "rollup": "^0.41.6",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-uglify": "^1.0.1"
+  }
+}
