@@ -80,7 +80,7 @@ Not implemented yet.
 
 In `package.json`, add a command to build your package:
 
-```json
+```
   ...
   "scripts": {
     "build": "last-step",
