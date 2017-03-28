@@ -135,7 +135,7 @@ const prepareBundles = options => {
 		delete bundle.minify;
 
 		bundle.plugins = [];
-		if (babelOptions) {
+		if (bundle.babel && Object.keys(bundle.babel)) {
 			bundle.plugins.push(babel(babelOptions));
 		}
 		if (minify) {
