@@ -1,18 +1,21 @@
 # Last Step
 
-Make your project production-ready by rolling up and minifying JavaScript
-files and CSS/LESS style sheets.
+Make your project production-ready by rolling up and minifying HTML files,
+JavaScript scripts and CSS/LESS stylesheets.
 
 ## What is it?
 
-This module provides an easy way to combine and minify your JavaScript and
-CSS/LESS files. For JavaScript, it uses [rollup.js](https://rollupjs.org/)
+This module provides an easy way to combine and minify your HTML, JavaScript
+and CSS/LESS files.
+HTML is processed via [HTMLMinifier](https://github.com/kangax/html-minifier).
+For JavaScript, it uses [rollup.js](https://rollupjs.org/)
 for combining files, [Babel](https://babeljs.io/)
 (via [rollup-plugin-babel](https://github.com/rollup/rollup-plugin-babel))
 as code transpiler and [UglifyJS2](https://github.com/mishoo/UglifyJS2)
 (via [rollup-plugin-uglify](https://github.com/TrySound/rollup-plugin-uglify))
-for file minification. For CSS/LESS, it uses [less](http://lesscss.org/) for
-inline importing and CSS minification.
+for file minification.
+For CSS/LESS, it uses [less](http://lesscss.org/) for inline importing and
+CSS minification.
 
 ## How to install
 
@@ -31,10 +34,24 @@ module.exports = {
   // target directory
   targetDirectory: 'public',
   // these files will not be copied to the target directory
-  doNotCopy: ['*.js', '*.css', '*.less'],
+  doNotCopy: ['*.html', '*.js', '*.css', '*.less'],
+  // options for HTML files
+  html: [
+    {
+      // wheter code should be minified
+      minify: true,
+      // for HTML files, file name and location will not be changed
+      entries: ['index.html'],
+      // the following options will be passed to HTMLMinifier
+      minifyCSS: true,
+      minifyJS: true
+    }
+  ],
   // options for JavaScript files
   javascript: [
     {
+      // whether code should be minified
+      minify: true,
       // these options will be passed to rollup
       // see also: https://github.com/rollup/rollup/wiki/JavaScript-API
       entry: 'script-1.js',
@@ -49,28 +66,26 @@ module.exports = {
         babelrc: false,
         exclude: 'node_modules/**',
         presets: ['es2015-rollup', 'stage-1']
-      },
-      // whether code should be minified
-      minify: true
+      }
     }
   ],
   // options for CSS files
   css: [
     {
+      // wheter code should be minified
+      minify: true,
       // entries to be processed
       // use less' import (inline) to include external style sheets
       entries: ['style-1.less', 'style-2.css'],
       // file to write to
-      dest: 'main.css',
-      // wheter code should be minified
-      minify: true
+      dest: 'main.css'
     }
   ]
 }
 ```
 
 The reason a `.js` file is used for configuration, instead of a `.json` file,
-is that when there are repetitive configuration segments, you can use put them
+is that when there are repetitive configuration segments, you can put them
 in variables and reuse them.
 
 ### Configure via JavaScript
