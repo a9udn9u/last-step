@@ -44,6 +44,7 @@ module.exports = {
       ...
       // these options will be passed to rollup-plugin-babel
       // see also: https://github.com/rollup/rollup-plugin-babel#configuring-babel
+      // note: babel will not be called if this section is omitted
       babel: {
         babelrc: false,
         exclude: 'node_modules/**',

@@ -89,7 +89,9 @@ const run = () => {
 
 	// process js
 	bundles.javascript.forEach(bundle => {
-		rollup.rollup(bundle).then(result => result.write(bundle));
+		rollup.rollup(bundle)
+			.then(result => result.write(bundle))
+			.catch(err => { throw err; });
 	});
 
 	// process css
@@ -127,15 +129,15 @@ const prepareBundles = options => {
 	};
 
 	(options.javascript || []).forEach(bundle => {
-		let babelOptions = Object.assign({}, defaultJsRollupPluginOptions.babel, bundle.babel);
 		let minify = bundle.minify === undefined ? defaultJsRollupPluginOptions.minify : bundle.minify;
+		let babelOptions = Object.keys(bundle.babel || {}).length ? Object.assign({}, defaultJsRollupPluginOptions.babel, bundle.babel) : undefined;
 
 		bundle = Object.assign({}, defaultJsRollupOptions, bundle);
 		delete bundle.babel;
 		delete bundle.minify;
 
 		bundle.plugins = [];
-		if (bundle.babel && Object.keys(bundle.babel)) {
+		if (babelOptions) {
 			bundle.plugins.push(babel(babelOptions));
 		}
 		if (minify) {
