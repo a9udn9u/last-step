@@ -19,13 +19,13 @@ const defaultOptions = {
 	sourceDirectory: 'src',
 	targetDirectory: 'public',
 	doNotCopy: ['*.html', '*.js', '*.css', '*.less'],
-  html: [
-    {
-      entries: ['index.html'],
-      minifyCSS: true,
-      minifyJS: true
-    }
-  ],
+	html: [
+		{
+			entries: ['index.html'],
+			minifyCSS: true,
+			minifyJS: true
+		}
+	],
 	javascript: [
 		{
 			entry: 'script-1.js',
