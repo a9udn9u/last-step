@@ -1,6 +1,6 @@
 {
   "name": "last-step",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Make your project production ready by combining and minifying HTML/JS/CSS files.",
   "main": "index.js",
   "scripts": {},
