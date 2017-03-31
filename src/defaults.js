@@ -39,7 +39,7 @@ const defaults = {
 
   // default rollup.js options
   rollupOptions: {
-
+    format: 'es'
   },
 
   // default Babel options
