@@ -46,7 +46,8 @@ const run = () => {
 
   if (options.javascript.length) {
     promises.push(js.process(options.javascript, options,
-        defaults.rollupOptions, defaults.babelOptions, defaults.uglifyJSOptions));
+        defaults.rollupOptions, defaults.babelOptions, defaults.nodeResolveOptions,
+        defaults.uglifyJSOptions));
   }
 
   Promise.all(promises)

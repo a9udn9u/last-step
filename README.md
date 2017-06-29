@@ -15,6 +15,8 @@ Specifically, *Last Step* depends on the following projects:
 * [Babel](https://babeljs.io/)
   (via [rollup-plugin-babel](https://github.com/rollup/rollup-plugin-babel))
   for JavaScript transpiling.
+* [rollup-plugin-node-resolve](https://github.com/rollup/rollup-plugin-node-resolve)
+  for bundle node modules inline.
 * [UglifyJS2](https://github.com/mishoo/UglifyJS2)
   (via [rollup-plugin-uglify](https://github.com/TrySound/rollup-plugin-uglify))
   for JavaScript minification.
@@ -98,6 +100,9 @@ module.exports = {
       // Options for Babel
       // see also: https://babeljs.io/docs/usage/api/#options
       babelOptions: { ... },
+      // Options for rollup-plugin-node-resolve
+      // see also: * https://github.com/rollup/rollup-plugin-node-resolve#usage
+      nodeResolveOptions: { ... },
       // Options for UglifyJS2's minify() method
       // see also: https://github.com/mishoo/UglifyJS2#api-reference
       uglifyJSOptions: { ... }

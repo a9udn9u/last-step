@@ -2,6 +2,7 @@ const path = require('path');
 const rollup = require('rollup');
 const babel = require('rollup-plugin-babel');
 const uglify = require('rollup-plugin-uglify');
+const resolve = require('rollup-plugin-node-resolve');
 const utils = require('./utils');
 
 const transformEntries = entries => entries.reduce((memo, entry) => {
@@ -10,16 +11,20 @@ const transformEntries = entries => entries.reduce((memo, entry) => {
 }, {});
 
 module.exports = {
-  process: (bundles, options, defaultRollupOptions, defaultBabelOptions, defaultUglifyJSOptions) => {
+  process: (bundles, options, defaultRollupOptions, defaultBabelOptions, defaultNodeResolveOptions,
+      defaultUglifyJSOptions) => {
     let promises = [];
     let targets = [];
     bundles.forEach(bundle => {
       let entries = transformEntries(bundle.entries || []);
       let bundleRollupOptions = utils.shallowMerge(defaultRollupOptions, bundle.rollupOptions);
       let babelOptions = utils.shallowMerge(defaultBabelOptions, bundle.babelOptions);
+      let nodeResolveOptions = utils.shallowMerge(defaultNodeResolveOptions,
+          bundle.nodeResolveOptions);
       let uglifyJSOptions = utils.shallowMerge(defaultUglifyJSOptions, bundle.uglifyJSOptions);
       bundleRollupOptions.plugins = (bundleRollupOptions.plugins || []).concat([
         babel(babelOptions),
+        resolve(nodeResolveOptions),
         uglify(uglifyJSOptions)
       ]);
       utils.matchOrEqual(options.manifest, Object.keys(entries)).forEach(entry => {

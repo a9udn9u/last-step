@@ -51,6 +51,11 @@ const defaults = {
   // default UglifyJS2 options
   uglifyJSOptions: {
 
+  },
+
+  // default rollup-plugin-node-resolve options
+  nodeResolveOptions: {
+
   }
 };
 

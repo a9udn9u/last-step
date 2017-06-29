@@ -1,6 +1,6 @@
 {
   "name": "last-step",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Make your project production ready by combining and minifying HTML/JS/CSS files.",
   "main": "index.js",
   "scripts": {},
@@ -58,6 +58,7 @@
     "request": "^2.81.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^1.0.1",
     "uglify-js": "github:mishoo/UglifyJS2#harmony",
     "walk": "^2.3.9"
