@@ -36,9 +36,9 @@ npm i -D last-step
 ```javascript
 module.exports = {
   // Source directory where source files are located
-  sourceDirectory: 'src',
+  sourceDir: 'src',
   // Target directory where processed files should be copy to
-  targetDirectory: 'public',
+  targetDir: 'public',
   // Options for HTML files
   html: [
     {
