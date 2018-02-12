@@ -6,14 +6,14 @@ import { State } from '~/states/state';
 import { IncrementalState } from '~/states/incr-state';
 import { Rule, Task, EditEvent, EditQueue } from '~/models/builder-models';
 
-const BUILD_DELAY = 2000;
+const BUILD_DELAY = 250;
 
 const CHOKIDAR_OPTIONS = {
   persistent: true,
   ignoreInitial: true,
   followSymlinks: true,
   usePolling: false,
-  atomic: 500,
+  atomic: 250,
   alwaysStat: false,
   awaitWriteFinish: true
 };

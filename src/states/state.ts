@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Utils } from '~/utils';
 import { Environment, Rule, Task } from '~/models/builder-models';
 import { Context, TargetToSources } from '~/models/state-models';
-import { FinalizerInput,ProcessorInput, ProcessorInputEntry,ProcessorOutput } from '~/models/processor-models';
+import { FinalizerInput,ProcessorInput, ProcessorInputEntry, ProcessorOutput } from '~/models/processor-models';
 
 export class State {
   protected env: Environment;
@@ -37,11 +37,14 @@ export class State {
   private static toRelativePaths(sourceDir: string, paths: Set<string>): Set<string> {
     return new Set([...paths]
       .map(p => {
-        if (!path.isAbsolute(p)) return p;
-        if (p.startsWith(`${sourceDir}/`)) return path.relative(sourceDir, p);
-        return null;
+        p = Utils.getLocalPath(p);
+        if (p) {
+          if (!path.isAbsolute(p)) return p;
+          if (p.startsWith(`${sourceDir}/`)) return path.relative(sourceDir, p);
+        }
+        return undefined;
       })
-      .filter(p => p !== null)
+      .filter(p => p !== undefined)
     );
   }
 
@@ -110,31 +113,32 @@ export class State {
    */
   nextInput(): ProcessorInput {
     let nextRootDir = this.nextRootDir();
+    let input: ProcessorInput;
     let nextContext = new Context({
       rootDir: nextRootDir,
       workDir: path.resolve(nextRootDir, this.env.relativeSourceDir),
-      index: this.contexts.length,
-      input: new ProcessorInput()
+      index: this.contexts.length
     });
     if (!this.contexts.length) {
       nextContext.sourceDir = this.env.sourceDir;
+      input = new ProcessorInput(nextContext.sourceDir, nextContext.workDir);
       this.rule.files.forEach(file =>
-        nextContext.input.add(this.processorInput(nextContext, file))
+        input.add(this.processorInput(nextContext, file))
       );
     } else {
       let prevContext = Utils.lastElement(this.contexts);
       nextContext.sourceDir = prevContext.workDir;
-      for (let entry of prevContext.output.values()) {
+      input = new ProcessorInput(nextContext.sourceDir, nextContext.workDir);
+      for (let [target, entry] of prevContext.output.targetEntries()) {
         if (entry.imported) {
           Utils.dbg() && Utils.debug(`Skipping imported file: ${entry.target}`);
         } else {
-          let relPath = path.relative(prevContext.workDir, entry.target);
-          nextContext.input.add(this.processorInput(nextContext, relPath))
+          input.add(this.processorInput(nextContext, target))
         }
       }
     }
     this.contexts.push(nextContext);
-    return nextContext.input;
+    return nextContext.input = input;
   }
 
   /**
@@ -164,22 +168,20 @@ export class State {
     context.output = output;
     if (Utils.dbg()) Utils.debug(`${this.name}: Output`, context.output);
 
-    this.handleFailures(output.failures);
+    this.handleFailures(context.output.failures);
 
     let tts = new TargetToSources();
-    for (let entry of context.output.values()) {
-      let target = path.relative(context.workDir, entry.target);
+    for (let [target, entry] of context.output.targetEntries()) {
       // Convert included file paths to relative path
       tts.set(target, State.toRelativePaths(context.sourceDir, entry.contains));
     }
 
     // In the next step, imported files should be skipped.
-    let toBeRemoved = State.getImportedTargets(tts);
-    Utils.dbg() && Utils.debug('Excluded from next processor:', toBeRemoved);
-    toBeRemoved.forEach(target => {
-      let absPath = path.resolve(context.workDir, target);
-      context.output.getByTarget(absPath).imported = true;
-    });
+    let imported = State.getImportedTargets(tts);
+    Utils.dbg() && Utils.debug('Imported files will be excluded from next processor:', imported);
+    imported.forEach(target =>
+      context.output.getByTarget(target).imported = true
+    );
 
     // TODO: This is a hack, IncrementalState needs this to map to do
     // its own calculation, we saved it in context to avoid duplicated

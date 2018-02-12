@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 export class ProcessResult {
   private importFiles: Set<string>;
   private targetFile: string;
@@ -50,15 +52,19 @@ export class ProcessorOutputEntry extends ProcessorIOEntry {
 class ProcessorIO<T extends ProcessorIOEntry> {
   private bySourceMap: Map<string, T>;
   private byTargetMap: Map<string, T>;
+  private sourceDirProp: string;
+  private workDirProp: string;
 
-  constructor() {
+  constructor(sourceDir: string, workDir: string) {
     this.bySourceMap = new Map();
     this.byTargetMap = new Map();
+    this.sourceDirProp = sourceDir;
+    this.workDirProp = workDir;
   }
 
   add(entry: T): void {
-    this.bySourceMap.set(entry.source, entry);
-    this.byTargetMap.set(entry.target, entry);
+    this.bySourceMap.set(path.relative(this.sourceDir, entry.source), entry);
+    this.byTargetMap.set(path.relative(this.workDir, entry.target), entry);
   }
 
   hasSource(key: string): boolean {
@@ -81,12 +87,28 @@ class ProcessorIO<T extends ProcessorIOEntry> {
     yield* this.bySourceMap.values();
   }
 
+  *targetEntries(): Iterable<[string, T]> {
+    yield* this.byTargetMap.entries();
+  }
+
+  *sourceEntries(): Iterable<[string, T]> {
+    yield* this.bySourceMap.entries();
+  }
+
   get sources(): string[] {
     return [...this.values()].map(entry => entry.source);
   }
 
   get targets(): string[] {
     return [...this.values()].map(entry => entry.target);
+  }
+
+  get sourceDir(): string {
+    return this.sourceDirProp;
+  }
+
+  get workDir(): string {
+    return this.workDirProp;
   }
 }
 
@@ -98,7 +120,7 @@ export class ProcessorOutput extends ProcessorIO<ProcessorOutputEntry> {
 }
 
 export class FinalizerInput {
-  sourceSet: Set<string>;
+  private sourceSet: Set<string>;
   sourceDir: string;
 
   constructor() {

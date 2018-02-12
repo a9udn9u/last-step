@@ -129,6 +129,21 @@ export class Utils {
   }
 
   /**
+   * Naive check if a given path represent local files. If not, returns
+   * undefined; If yes, returns the path with possible 'file://' scheme
+   * removed.
+   */
+  static getLocalPath(url: string): string {
+    if (!/^[\w-]+:\/\//.test(url)) {
+      return url;
+    }
+    if (url.toLocaleLowerCase().startsWith('file://')) {
+      return url.replace(/^file:\/\//i, '');
+    }
+    return undefined;
+  }
+
+  /**
    * Get the last element in the given collection.
    * Not sure about the performance so should not use on large collections.
    * @param {Iterable<T>} iterable Iterable collection

@@ -44,8 +44,8 @@ export class IncrementalState extends State {
    * @param file The added/updated/deleted file.
    * @returns List of files requiring re-compile.
    */
-  private findReompileSources(file: string): Set<string> {
-    let targets = this.sourceToTargets.get(file) || new Set<string>();
+  private findReompileSources(source: string): Set<string> {
+    let targets = this.sourceToTargets.get(source) || new Set<string>();
     let sources = new Set<string>();
     targets.forEach(finalTarget => {
       // Backtracking source
@@ -71,7 +71,7 @@ export class IncrementalState extends State {
     // At this point, new context hasn't been pushed to this.contexts,
     // so index should be context length without minus one
     let lastBuildContext = this.getLastBuildContext(this.contexts.length);
-    return lastBuildContext ? lastBuildContext.workDir : super.nextRootDir();
+    return lastBuildContext ? lastBuildContext.rootDir : super.nextRootDir();
   }
 
   protected processorInput(context: Context, file: string): ProcessorInputEntry {
@@ -82,19 +82,23 @@ export class IncrementalState extends State {
       undefined
     );
 
+    let lastBuildContext = this.getLastBuildContext(context.index);
     // Original source files in recompileSources should be compiled
     if (context.index === 0) {
-      entry.shouldCompile = this.recompileSources.has(file);
+      if (this.recompileSources.has(file)) {
+        entry.shouldCompile = true;
+        Utils.dbg() && Utils.debug(`Recompile ${file} because itself or its dependencies have changed.`);
+      }
     }
     // First build, or previous build didn't advance to this step, source should be
     // compiled regardless.
-    let lastBuildContext = this.getLastBuildContext(context.index);
-    if (!lastBuildContext) {
+    else if (!lastBuildContext) {
       entry.shouldCompile = true;
     }
     // No ouput from last exection, either this is a new file, or the file
     // failed compile last time, either way it should be re-compiled
     else if (!lastBuildContext.output.hasSource(file)) {
+      Utils.dbg() && Utils.debug(`Recompile ${file} because it's new or it failed last time.`);
       entry.shouldCompile = true;
     }
 
@@ -127,6 +131,7 @@ export class IncrementalState extends State {
     if (this.rule.files.size) {
       this.targetToSources = new TargetToSources();
       this.rule.files.forEach(f => this.targetToSources.set(f, new Set([f])));
+      this.sourceToTargets = this.targetToSources.flip();
     }
     this.lastBuildContexts = this.contexts;
     this.contexts = [];

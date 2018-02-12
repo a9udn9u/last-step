@@ -6,26 +6,8 @@ import { Processor } from '~/processors/processor';
  * Simple 1-to-M mapping
  */
 class OneToMany<T> extends Map<T, Set<T>> {
-  protected map: Map<T, Set<T>>;
-
   constructor() {
     super();
-    this.map = new Map();
-  }
-
-  /**
-   * Create a new map with flipped key/values
-   */
-  flip(): OneToMany<T> {
-    let flipped: OneToMany<T> = new OneToMany<T>();
-    this.map.forEach((values, key) => {
-      values.forEach(val => {
-        let rev = flipped.get(val) || new Set<T>();
-        rev.add(key);
-        flipped.set(val, rev);
-      });
-    });
-    return flipped;
   }
 }
 
@@ -46,12 +28,27 @@ export class TargetToSources extends OneToMany<string> {
    * @param {Object} oldTts Old targetToSourcesMap
    */
   trace(oldTTS: TargetToSources): void {
-    this.map.forEach((values, key) => {
+    this.forEach((values, key) => {
       let newValues = Array.from(values)
           .map(v => oldTTS.get(v))
           .reduce((all, vals) => Utils.union(all, vals), new Set());
       this.set(key, newValues);
     });
+  }
+
+  /**
+   * Create a new map with flipped key/values
+   */
+  flip(): SourceToTargets {
+    let flipped: SourceToTargets = new SourceToTargets();
+    this.forEach((values, key) => {
+      values.forEach(val => {
+        let rev = flipped.get(val) || new Set<string>();
+        rev.add(key);
+        flipped.set(val, rev);
+      });
+    });
+    return flipped;
   }
 }
 
