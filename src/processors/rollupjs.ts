@@ -11,6 +11,17 @@ import { Processor } from '~/processors/processor';
 import { ProcessResult } from '~/models/processor-models';
 
 const DEFAULT_OPTS = {
+  // Turn off plugins
+  plugins: {
+    babel: true,
+    nodeResolve: true,
+    nodeBuiltins: true,
+    nodeGlobals: true,
+    commonJS: true,
+    json: true,
+    replace: true,
+  },
+
   // rollup.js
   rollupJS: {
     output: {
@@ -50,16 +61,27 @@ export class RollupJSProcessor extends Processor {
   constructor(options: any = {}) {
     super();
     options = options || {};
+    let pluginToggles = Utils.shallowMerge(DEFAULT_OPTS.plugins || options.plugins);
+    let plugins = [];
+
+    if (pluginToggles.replace)
+      plugins = plugins.concat(replace(Utils.shallowMerge(DEFAULT_OPTS.replace, options.replace)));
+    if (pluginToggles.nodeGlobals)
+      plugins = plugins.concat(globals());
+    if (pluginToggles.nodeBuiltins)
+      plugins = plugins.concat(builtins());
+    if (pluginToggles.json)
+      plugins = plugins.concat(json(Utils.shallowMerge(DEFAULT_OPTS.json, options.json)));
+    if (pluginToggles.nodeResolve)
+      plugins = plugins.concat(resolve(Utils.shallowMerge(DEFAULT_OPTS.nodeResolve, options.nodeResolve)));
+    if (pluginToggles.babel)
+      plugins = plugins.concat(babel(Utils.shallowMerge(DEFAULT_OPTS.babel, options.babel)));
+    if (pluginToggles.commonJS)
+      plugins = plugins.concat(commonjs(Utils.shallowMerge(DEFAULT_OPTS.commonJS, options.commonJS)));
+
     this.options = Utils.shallowMerge(DEFAULT_OPTS.rollupJS, options.rollupJS);
-    this.options.plugins = (this.options.plugins || []).concat(
-      replace(Utils.shallowMerge(DEFAULT_OPTS.replace, options.replace)),
-      globals(),
-      builtins(),
-      json(Utils.shallowMerge(DEFAULT_OPTS.json, options.json)),
-      resolve(Utils.shallowMerge(DEFAULT_OPTS.nodeResolve, options.nodeResolve)),
-      babel(Utils.shallowMerge(DEFAULT_OPTS.babel, options.babel)),
-      commonjs(Utils.shallowMerge(DEFAULT_OPTS.commonJS, options.commonJS)),
-    );
+    this.options.plugins = plugins.concat(this.options.plugins || []);
+
     Utils.dbg() && Utils.debug('Options:', this.options);
   }
 

@@ -1,7 +1,5 @@
 import { CopyProcessor } from '~/processors/copy';
 import { HTMLMinifierProcessor } from '~/processors/html-minifier';
-import { SASSProcessor } from '~/processors/sass';
-import { LESSProcessor } from '~/processors/less';
 import { CleanCSSProcessor } from '~/processors/clean-css';
 import { RollupJSProcessor } from '~/processors/rollupjs';
 import { UglifyJSProcessor } from '~/processors/uglifyjs';
@@ -59,8 +57,6 @@ export const defaultConfig = {
     {
       sources: [/.*\.(css|less|sass)$/i],
       processors: [
-        // new SASSProcessor(),
-        new LESSProcessor(),
         new CleanCSSProcessor()
       ]
     },
