@@ -3,7 +3,6 @@ import { HTMLMinifierProcessor } from '~/processors/html-minifier';
 import { SASSProcessor } from '~/processors/sass';
 import { LESSProcessor } from '~/processors/less';
 import { CleanCSSProcessor } from '~/processors/clean-css';
-import { BabelProcessor } from '~/processors//babel';
 import { RollupJSProcessor } from '~/processors/rollupjs';
 import { UglifyJSProcessor } from '~/processors/uglifyjs';
 
@@ -70,7 +69,6 @@ export const defaultConfig = {
       sources: [/.*\.(js|es6)$/i],
       processors: [
         new RollupJSProcessor(),
-        new BabelProcessor(),
         new UglifyJSProcessor()
       ]
     }

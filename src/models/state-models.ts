@@ -31,6 +31,7 @@ export class TargetToSources extends OneToMany<string> {
     this.forEach((values, key) => {
       let newValues = Array.from(values)
           .map(v => oldTTS.get(v))
+          .filter(vals => !!vals)
           .reduce((all, vals) => Utils.union(all, vals), new Set());
       this.set(key, newValues);
     });

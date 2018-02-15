@@ -1,4 +1,5 @@
 import * as rollup from 'rollup';
+import * as babel from 'rollup-plugin-babel';
 import * as resolve from 'rollup-plugin-node-resolve';
 import * as builtins from 'rollup-plugin-node-builtins';
 import * as globals from 'rollup-plugin-node-globals';
@@ -16,6 +17,12 @@ const DEFAULT_OPTS = {
       format: 'iife',
       name: 'LastStepDummyName'
     }
+  },
+
+  babel: {
+    babelrc: false,
+    presets: ['env', { modules: false }],
+    plugins: ['external-helpers']
   },
 
   // rollup-plugin-node-resolve
@@ -50,6 +57,7 @@ export class RollupJSProcessor extends Processor {
       builtins(),
       json(Utils.shallowMerge(DEFAULT_OPTS.json, options.json)),
       resolve(Utils.shallowMerge(DEFAULT_OPTS.nodeResolve, options.nodeResolve)),
+      babel(Utils.shallowMerge(DEFAULT_OPTS.babel, options.babel)),
       commonjs(Utils.shallowMerge(DEFAULT_OPTS.commonJS, options.commonJS)),
     );
     Utils.dbg() && Utils.debug('Options:', this.options);

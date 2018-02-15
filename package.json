@@ -49,7 +49,7 @@
   },
   "homepage": "https://github.com/a9udn9u/last-step#readme",
   "dependencies": {
-    "babel-core": "^6.26.0",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
     "chokidar": "^2.0.0",
     "clean-css": "^4.1.9",
@@ -61,6 +61,7 @@
     "minimist": "^1.2.0",
     "node-sass": "^4.7.2",
     "rollup": "^0.54.1",
+    "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-builtins": "^2.1.2",
