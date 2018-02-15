@@ -82,7 +82,7 @@ module.exports = {
 
 Sources are matched against each rule in reverse order, so in the above configuration, `a.css` will match `/.*\.css$/i`, not the catch all `/^.*$/`.
 
-There are a few other built-in processors: LESSProcessor and SASSProcessors which process .less and .sass files respectively. There is also an individual BabelProcessor for people wants to use babel without rollup.
+There are a few other built-in processors: LESSProcessor and SASSProcessors which process .less and .sass files respectively. There is also an individual BabelProcessor for people want to use babel without rollup.
 
 Default settings for each processor can be found in code: [Click here](src/processors)
 
@@ -171,6 +171,7 @@ That's it, for most built-in processors, all they do is read the file content, p
 [This](src/defaults.ts) is the default configuration.
 
 RollupProcessor by default enabled the following plugins:
+
 * [rollup-plugin-replace](https://github.com/rollup/rollup-plugin-replace)
 * [rollup-plugin-node-globals](https://github.com/calvinmetcalf/rollup-plugin-node-globals)
 * [rollup-plugin-node-builtins](https://github.com/nolanlawson/rollup-pulgin-node-builtins)
@@ -178,7 +179,8 @@ RollupProcessor by default enabled the following plugins:
 * [rollup-plugin-node-resolve](https://github.com/rollup/rollup-plugin-node-resolve)
 * [rollup-plugin-babel](https://github.com/rollup/rollup-plugin-babel)
 * [rollup-plugin-commonjs](https://github.com/rollup/rollup-plugin-commonjs)
-They can be disabled by setting `plugins.[name]` to `false` in RollupJSProcessor options, see [here](src/processors/rollupjs.ts).
+
+They can be disabled by setting `plugins.[name]` to `false` in RollupJSProcessor options, see [here](src/processors/rollupjs.ts#L15-L23).
 
 BabelProcessor uses [babel-preset-env](https://github.com/babel/babel-preset-env) by default.
 
