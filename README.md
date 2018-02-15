@@ -14,6 +14,8 @@
 
 Last Step v2 is a complete re-write, it's now easier to configure, has a simple plug-in system and comes with a build server that builds files when they are changed.
 
+**Configuration of v1 is not compatible with v2, hopefully it a simple conversion and will be simpler in v2.**
+
 ## Installation
 
 ```bash
