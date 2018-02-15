@@ -21,7 +21,7 @@ const DEFAULT_OPTS = {
 
   babel: {
     babelrc: false,
-    presets: ['env', { modules: false }],
+    presets: [['env', { modules: false }]],
     plugins: ['external-helpers']
   },
 
