@@ -1,4 +1,4 @@
-const IncrementalState = include('~/builders/incr-state');
+const IncrementalState = include('~/states/incr-state').IncrementalState;
 
 describe('getNewTTS()', () => {
   test('When old TTS is empty', () => {

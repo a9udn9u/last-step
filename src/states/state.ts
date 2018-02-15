@@ -146,8 +146,8 @@ export class State {
    * @returns {FinalizerInput} Input for Finalizer
    */
   finalizerInput(): FinalizerInput {
-    let input = new FinalizerInput();
     let context = Utils.lastElement(this.contexts);
+    let input = new FinalizerInput(context.workDir);
     for (let entry of context.output.values()) {
       if (entry.imported) {
         Utils.dbg() && Utils.debug(`Skipping imported file: ${entry.target}`);
@@ -155,7 +155,6 @@ export class State {
         input.add(entry.target);
       }
     }
-    input.sourceDir = context.workDir;
     return input;
   }
 

@@ -123,8 +123,9 @@ export class FinalizerInput {
   private sourceSet: Set<string>;
   sourceDir: string;
 
-  constructor() {
+  constructor(sourceDir: string) {
     this.sourceSet = new Set();
+    this.sourceDir = sourceDir;
   }
 
   add(source: string) {

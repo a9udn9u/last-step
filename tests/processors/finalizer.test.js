@@ -1,39 +1,27 @@
-const Finalizer = include('~/processors/finalizer');
+const { FinalizerInput } = require ('~/models/processor-models');
+const { Finalizer } = require('~/processors/finalizer');
 
-jest.mock('../../src/utils');
-const utils = include('~/utils');
+jest.mock('~/utils');
+jest.mock('fs-extra');
+const Utils = require('~/utils').Utils;
 
 beforeEach(() => {
   jest.clearAllMocks();
 })
 
-describe('process()', () => {
+describe('finalize()', () => {
   test('Merge all into one target file', async () => {
-    let finalizer = new Finalizer(
-      { targetDir: '/fake-root/fake-target', },
-      { targets: 'fake-path/target.js' }
-    );
-    let result = await finalizer.process(new Map([
-      ['a/1', {
-        'source': '/fake/source/1',
-        'target': '/will/ignore'
-      }],
-      ['a/2', {
-        'source': '/fake/source/2',
-        'target': '/will/ignore/too'
-      }]
-    ]));
+    let finalizer = new Finalizer('/fake-root/fake-target', 'fake-path/target.js');
+    let input = new FinalizerInput('/fake/dir');
+    input.add('/fake/dir/1');
+    input.add('/fake/dir/2');
+    let result = await finalizer.finalize(input);
     let fakeTarget = '/fake-root/fake-target/fake-path/target.js';
-    let output = result.output;
-    expect(result.workDir).toBe('/fake-root/fake-target');
-    expect(output.size).toBe(1);
-    let outputEntry = output.get('fake-path/target.js');
-    expect(outputEntry.source).toBe('/fake/source/1');
-    expect(outputEntry.target).toBe(fakeTarget);
-    expect(outputEntry.contains).toEqual(['a/1', 'a/2']);
+    expect(result.length).toBe(1);
+    expect(result[0]).toBe(fakeTarget);
     expect(Utils.copyFiles).toHaveBeenCalledTimes(0);
     expect(Utils.concatFiles).toHaveBeenCalledTimes(1);
-    expect(Utils.concatFiles).toHaveBeenCalledWith(fakeTarget, ['/fake/source/1', '/fake/source/2']);
+    expect(Utils.concatFiles).toHaveBeenCalledWith(fakeTarget, ['/fake/dir/1', '/fake/dir/2']);
   });
 
   test('One to one copy', async () => {
@@ -41,7 +29,7 @@ describe('process()', () => {
       { targetDir: '/fake-root/fake-target', },
       { targets: undefined }
     );
-    let result = await finalizer.process(new Map([
+    let result = await finalizer.finalize(new Map([
       ['a/1', {
         'source': '/fake/source/1',
         'target': '/will/ignore'
@@ -75,7 +63,7 @@ describe('process()', () => {
       { targetDir: '/fake-root/fake-target', },
       { targets: ['b/1', 'b/2'] }
     );
-    let result = await finalizer.process(new Map([
+    let result = await finalizer.finalize(new Map([
       ['a/1', {
         'source': '/fake/source/1',
         'target': '/will/ignore'

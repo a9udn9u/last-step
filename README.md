@@ -1,32 +1,27 @@
 # Last Step
 
-Make your project production-ready by rolling up and minifying HTML files,
-JavaScript scripts and CSS/LESS stylesheets.
-
 ## What is it?
 
-*Last Step* provides an easy way to combine and minify your HTML, JavaScript
-and CSS/LESS files. It glues other tools together to achieve this goal.
-Specifically, *Last Step* depends on the following projects:
+*Last Step* provides an easy way to combine, transform and minify HTML, JavaScript and CSS/LESS files. It glues other tools together to achieve this goal. Specifically, *Last Step* depends on the following projects:
 
-* [HTMLMinifier](https://github.com/kangax/html-minifier) for HTML
-  minification.
+* [HTMLMinifier](https://github.com/kangax/html-minifier) for HTML minification.
 * [rollup.js](https://rollupjs.org/) for JavaScript combination.
-* [Babel](https://babeljs.io/)
-  (via [rollup-plugin-babel](https://github.com/rollup/rollup-plugin-babel))
-  for JavaScript transpiling.
-* [rollup-plugin-node-resolve](https://github.com/rollup/rollup-plugin-node-resolve)
-  for bundle node modules inline.
-* [UglifyJS2](https://github.com/mishoo/UglifyJS2)
-  (via [rollup-plugin-uglify](https://github.com/TrySound/rollup-plugin-uglify))
-  for JavaScript minification.
-* [Less](http://lesscss.org/) for CSS inline importing and minification.
+* [Babel](https://babeljs.io/) for JavaScript transpiling.
+* [UglifyJS2](https://github.com/mishoo/UglifyJS2) JavaScript minification.
+* [Less](https://github.com/less/less.js) for LESS file processing.
+* [SASS](https://github.com/sass/node-sass) for SASS file processing.
+* [Clean CSS](https://github.com/jakubpawlowicz/clean-css) for CSS inline import and minification.
 
+Last Step v2 is a complete re-write, it's now easier to configure, has a simple plug-in system and comes with a build server that builds files when they are changed.
 
-## How to install
+## Installation
 
 ```bash
 npm i -D last-step
+```
+or
+```bash
+yarn add -D last-step
 ```
 
 ## Usage
@@ -39,96 +34,59 @@ module.exports = {
   sourceDir: 'src',
   // Target directory where processed files should be copy to
   targetDir: 'public',
-  // Options for HTML files
-  html: [
+
+  rules: [
     {
-      // HTML files to be processed.
-      // 1. Strings and regex are accepted
-      // 2. Regex are tested against file paths relative to the source directory
-      //    For example: for 'src/path/to/file', where 'src/' is the source
-      //    directory, regex will be tested against 'path/to/file'
-      // 3. HTML files are never combined, their relative paths inside of
-      //    the target directory will be the same as in the source directory
-      entries: [/.*\.html/],
-      // options for HTMLMinifier
-      // see also: https://github.com/kangax/html-minifier#options-quick-reference
-      htmlMinifierOptions: { ... }
+      // Source files, can be a regex pattern or string. Should be relative path in sourceDir
+      sources: [/^.*$/],
+      // Processors which will process matched source files.
+      processors: [
+        // Built-in copy processor, simply copies files
+        new CopyProcessor()
+      ]
     },
     {
-      // More HTML file groups
-      ...
-    }
-  ],
-  // Options for CSS files
-  css: [
-    {
-      // CSS files to be processed, rules are similar to HTML file entries,
-      // except that all matched CSS/LESS files will be combined into one
-      // target file
-      entries: [/^style-*.less/, 'other-styles.css'],
-      // The target file to write to
-      dest: 'main.css',
-      // Options for LESS
-      // see also: http://lesscss.org/usage/#programmatic-usage
-      lessOptions: { ... }
+      // This rule prevents certain files from been copied to targetDir
+      // No processors means matched files will not be processed
+      sources: [/(^|\/)(\.DS_Store|Thumbs\.db|\.git.*|\.cvs|.*~|.*\.swp)$/],
     },
     {
-      // More CSS bundles
-      ...
-    }
-  ],
-  // Options for JavaScript files
-  javascript: [
-    {
-      // JS files to be processed
-      entries: [
-        {
-          // Only strings are accepted, to combine JS files, use 'require',
-          // or 'import', rollup.js will handle the rest for you.
-          entry: 'script-1.js',
-          // The target file to write to, will use source file path if omitted
-          dest: 'main.js'
-        },
-        // You probably want to keep workers in separate files
-        { entry: 'workers/worker-1.js' }
-      ],
-      // Options for rollup.js
-      // see also: https://github.com/rollup/rollup/wiki/JavaScript-API
-      // note that rollup.js options 'entry' and 'dest' will be ignored
-      // because they are determined by the above 'entries' array
-      rollupOptions: { ... },
-      // Options for Babel
-      // see also: https://babeljs.io/docs/usage/api/#options
-      babelOptions: { ... },
-      // Options for rollup-plugin-node-resolve
-      // see also: * https://github.com/rollup/rollup-plugin-node-resolve#usage
-      nodeResolveOptions: { ... },
-      // Options for UglifyJS2's minify() method
-      // see also: https://github.com/mishoo/UglifyJS2#api-reference
-      uglifyJSOptions: { ... }
+      // This rule processes HTML files
+      sources: [/.*\.html?$/i],
+      processors: [
+        new HTMLMinifierProcessor()
+      ]
     },
     {
-      // More JS bundles
-      ...
+      // This rule processes CSS files
+      sources: [/.*\.css$/i],
+      processors: [
+        new CleanCSSProcessor()
+      ]
+    },
+    {
+      // This rule processes JavaScript files
+      sources: [/.*\.(js|es6)$/i],
+      // Files are chained through all processors so the output of the previous
+      // processor will be the input of the next processor.
+      processors: [
+        new RollupJSProcessor(),
+        new UglifyJSProcessor()
+      ]
     }
   ]
 }
 ```
 
-The configuration file must be located in the package root directory, named
-as `.last-step.js`. The reason *Last Step* uses `.js` file for configuration,
-instead of `.json` file, is because that you can't write `RegExp` literals
-in JSON.
+Sources are matched against each rule in reverse order, so in the above configuration, `a.css` will match `/.*\.css$/i`, not the catch all `/^.*$/`.
 
-All default settings &rarr; [Click here](src/defaults.js)
+There are a few other built-in processors: LESSProcessor and SASSProcessors which process .less and .sass files respectively. There is also an individual BabelProcessor for people wants to use babel without rollup.
 
-### Configure via JavaScript
+Default settings for each processor can be found in code: [Click here](src/processors)
 
-Not implemented yet.
+### Build Project
 
-### Build Your Project
-
-In `package.json`, add a command to build your package:
+In `package.json`, add a command:
 
 ```
   ...
@@ -139,7 +97,7 @@ In `package.json`, add a command to build your package:
   ...
 ```
 
-That's it.
+Then run `npm run build`.
 
 For the above example configuration, if you have the following package layout:
 
@@ -151,9 +109,8 @@ For the above example configuration, if you have the following package layout:
        |   |-- script-2.js (imported by script-1.js)
        |   |-- workers/
        |   |   +-- worker-1.js
-       |   |-- style-1.less (imports stylesheet from example.com/style.css)
-       |   |-- style-2.less
-       |   |-- other-styles.css
+       |   |-- style-1.css
+       |   |-- other-styles.css (imported by style-1.css)
        |   |-- index.html
        |   |-- sub-module/
        |   |   +-- sub-module.html
@@ -162,21 +119,66 @@ For the above example configuration, if you have the following package layout:
            +-- (empty)
 ```
 
-After `npm run build`, you will have:
+After build, you will have:
 
 ```
 (root) +-- (contents unchanged)
        +-- public/
-           +-- main.js (contents of both script-1.js and script-2.js)
+           +-- script-1.js (contents of both script-1.js and script-2.js)
            |-- workers/
            |   +-- worker-1.js (contents of worker-1.js and all its imports)
-           |-- main.css (contents of all CSS/LESS files)
+           |-- style-1.css (contents of both style-1.css and other-styles.css)
            |-- index.html
            |-- sub-module/
            |   +-- sub-module.html
            +-- res.jpg
 
 ```
+
+`npm run build -w` will start a build server, it will watch for file changes in the configured `sourceDir`, when updates are detected, it will automatically do re-build of the changed files. It also handles file dependencies so your `targetDir` should be always up-to-date.
+
+### Command Line Arguments
+
+`-c [file]` Override the default `.last-step.js` configuration file location.
+
+`-w` Start the build server.
+
+## Plug-ins
+
+Plug-ins are called `Processor`, all file processing functionalities are implemented as processors, including built-in processors. The processor interface is very simple:
+
+```javascript
+{
+    // Both input and output are strings of file paths.
+    // Input is the file which needs to be processed.
+    // Output is the file where processed contents should be written to.
+    process(input, output) {
+        // Process input, write results to output
+        return {
+            // If input file imported any dependencies, imported files should be returned.
+            imports: <Set<string>>
+        };
+    }
+}
+```
+
+That's it, for most built-in processors, all they do is read the file content, process it with an external tool (i.e., Babel), then write the results to file.
+
+## Default Behaviors
+
+[This](src/defaults.ts) is the default configuration.
+
+RollupProcessor by default enabled the following plugins:
+* [rollup-plugin-replace](https://github.com/rollup/rollup-plugin-replace)
+* [rollup-plugin-node-globals](https://github.com/calvinmetcalf/rollup-plugin-node-globals)
+* [rollup-plugin-node-builtins](https://github.com/nolanlawson/rollup-pulgin-node-builtins)
+* [rollup-plugin-json](https://github.com/rollup/rollup-plugin-json)
+* [rollup-plugin-node-resolve](https://github.com/rollup/rollup-plugin-node-resolve)
+* [rollup-plugin-babel](https://github.com/rollup/rollup-plugin-babel)
+* [rollup-plugin-commonjs](https://github.com/rollup/rollup-plugin-commonjs)
+They can be disabled by setting `plugins.[name]` to `false` in RollupJSProcessor options, see [here](src/processors/rollupjs.ts).
+
+BabelProcessor uses [babel-preset-env](https://github.com/babel/babel-preset-env) by default.
 
 ## License
 

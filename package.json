@@ -7,6 +7,7 @@
     "node": ">=7.6"
   },
   "scripts": {
+    "compile": "tsc",
     "test": "jest"
   },
   "bin": {
@@ -19,14 +20,6 @@
     "build.js",
     "index.js"
   ],
-  "jest": {
-    "testMatch": [
-      "<rootDir>/tests/**/*.test.js"
-    ],
-    "setupFiles": [
-      "<rootDir>/setup.js"
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/a9udn9u/last-step.git"

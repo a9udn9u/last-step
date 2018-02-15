@@ -1,4 +1,4 @@
-const State = include('~/builders/state');
+const State = include('~/states/state').State;
 
 describe('toRelativePaths()', () => {
   test('Test', () => {

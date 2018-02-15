@@ -20,12 +20,6 @@ const getPath = (mod) => {
   }
 }
 
-// Object.defineProperties(global, {
-//   'include': {
-//     value: (n) => require(getPath(n))
-//   }
-// });
-
 let Module = require('module');
 let dumbRequire = Module.prototype.require;
 

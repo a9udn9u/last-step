@@ -1,7 +1,7 @@
-const utils = include('~/utils');
+const { Utils } = require('~/utils');
 
 jest.mock('fs-extra');
-const fs = include('fs-extra');
+const fs = require('fs-extra');
 
 beforeEach(() => {
   jest.clearAllMocks();
