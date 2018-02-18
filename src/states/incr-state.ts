@@ -45,20 +45,24 @@ export class IncrementalState extends State {
    * @returns List of files requiring re-compile.
    */
   private findReompileSources(source: string): Set<string> {
-    let targets = this.sourceToTargets.get(source) || new Set<string>();
     let sources = new Set<string>();
-    targets.forEach(finalTarget => {
-      // Backtracking source
-      // TODO: This might be unncecessary though, the key of the output
-      // map is the original source (needs confirmation)
-      let file = finalTarget;
-      for (let i = this.contexts.length - 1; i >= 0; --i) {
-        let context = this.contexts[i];
-        file = context.output.getByTarget(file).source;
-        file = path.relative(context.sourceDir, file);
-      }
-      sources.add(file);
-    });
+    let targets = this.sourceToTargets.get(source);
+    if (!targets) {
+      sources.add(source);
+    } else {
+      targets.forEach(finalTarget => {
+        // Backtracking source
+        // TODO: This might be unncecessary though, the key of the output
+        // map is the original source (needs confirmation)
+        let file = finalTarget;
+        for (let i = this.contexts.length - 1; i >= 0; --i) {
+          let context = this.contexts[i];
+          file = context.output.getByTarget(file).source;
+          file = path.relative(context.sourceDir, file);
+        }
+        sources.add(file);
+      });
+    }
     Utils.dbg() && Utils.debug('Re-compile candidates:', sources);
     return sources;
   }
@@ -92,7 +96,7 @@ export class IncrementalState extends State {
     }
     // First build, or previous build didn't advance to this step, source should be
     // compiled regardless.
-    else if (!lastBuildContext) {
+    if (!lastBuildContext) {
       entry.shouldCompile = true;
     }
     // No ouput from last exection, either this is a new file, or the file
